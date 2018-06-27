@@ -40,6 +40,7 @@ define ca_cert::ca (
   Boolean $verify_https_cert     = true,
   Optional[String] $checksum     = undef,
   Optional[String] $ca_file_mode = $ca_cert::params::ca_file_mode,
+  Optional[String] $proxy        = undef,
 ) {
 
   include ::ca_cert::params
@@ -107,6 +108,11 @@ define ca_cert::ca (
             verify_peer => $verify_https_cert,
             require     => Package[$ca_cert::params::package_name],
             notify      => Class['::ca_cert::update'],
+          }
+          if $proxy != undef {
+            Remote_file["$ca_cert"] {
+              proxy => $proxy,
+            }
           }
         }
         'file': {
